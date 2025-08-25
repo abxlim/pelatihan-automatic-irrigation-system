@@ -6,10 +6,15 @@
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 
 // WiFi credentials
 char ssid[] = "Ws-Eletronika";
 char pass[] = "@bpvppdg25";
+
+// LCD object: address 0x27, 20 characters x 4 lines
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 
 const int soilResistPin = 33;
 unsigned int currentTime = 0;
@@ -20,6 +25,10 @@ void setup() {
   Serial.begin(9600);
 
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
+
+  // Initialize LCD
+  lcd.init();
+  lcd.backlight();
 }
 
 void loop() {
@@ -39,5 +48,15 @@ void loop() {
 
     currentTime = millis();
   }
+
+  // Print data to Serial monitor
+  lcd.setCursor(0, 0);
+  lcd.print("Kelembapan: ");
+  lcd.print(soilPercent);
+  lcd.print("%");
+  lcd.setCursor(0, 1);
+  lcd.print(F("Nilai ADC: "));
+  lcd.print(nilaiADC);
+
   delay(100);
 }
