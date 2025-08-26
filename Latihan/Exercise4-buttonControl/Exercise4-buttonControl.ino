@@ -17,7 +17,7 @@ void loop() {
     digitalWrite(ledPin, LOW);
   }
   if (digitalRead(bt2) == LOW) {
-    int humidityValue = analogRead(soilPin);
-    Serial.println(humidityValue);
+    int nilaiSensor = analogRead(soilPin);
+    Serial.println(nilaiSensor);
   }
 }
