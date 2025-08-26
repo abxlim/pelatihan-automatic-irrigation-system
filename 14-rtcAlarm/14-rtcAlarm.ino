@@ -3,9 +3,16 @@
 #include "RTClib.h"
 
 RTC_DS3231 rtc;
+DateTime now;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-const int ledPin = 34;
+const int ledPin = 13;
+bool ledState = false;
+unsigned int lastPrint = 0;
+unsigned int lastBlink = 0;
+int intervalPrint = 1000;
+int intervalBlink = 500;
+
 
 char daysOfTheWeek[7][12] = { "Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu" };
 
@@ -25,10 +32,34 @@ void setup() {
 
   lcd.init();
   lcd.backlight();
+
+  //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+
+  pinMode(ledPin, OUTPUT);
 }
 
 void loop() {
-  DateTime now = rtc.now();
+  now = rtc.now();
+
+  if (millis() - lastPrint >= intervalPrint) {
+    tampilLCD();
+    lastPrint = millis();
+  }
+
+  if ((now.hour() == 11) && (now.minute() == 2)) {
+    if (millis() - lastBlink >= intervalBlink) {
+      ledState = !ledState;
+      digitalWrite(ledPin, ledState);
+
+      lastBlink = millis();
+    }
+  } else {
+    digitalWrite(ledPin, LOW);
+  }
+}
+
+void tampilLCD() {
+  lcd.clear();
 
   lcd.setCursor(0, 0);
   lcd.print(now.day());
@@ -44,14 +75,4 @@ void loop() {
   lcd.print(now.second());
   lcd.setCursor(10, 1);
   lcd.print(daysOfTheWeek[now.dayOfTheWeek()]);
-
-
-  if ((now.hour() == 10) && (now.minute() == 35)) {
-    digitalWrite(ledPin, HIGH);
-    delay(100);
-    digitalWrite(ledPin, LOW);
-    delay(100);
-  } else {
-    digitalWrite(ledPin, LOW);
-  }
 }
