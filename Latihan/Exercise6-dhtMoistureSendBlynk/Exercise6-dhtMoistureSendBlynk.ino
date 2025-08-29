@@ -8,6 +8,8 @@
 
 const int soilMoisturePin = 36;
 
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>
 #include <WiFi.h>
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
@@ -17,6 +19,7 @@ const int soilMoisturePin = 36;
 char ssid[] = "Ws-Eletronika";
 char pass[] = "@bpvppdg25";
 
+LiquidCrystal_I2C lcd(0x27, 20, 4);
 DHT dht(DHTPIN, DHTTYPE);
 
 unsigned int lastSendTime = 0;
@@ -29,6 +32,8 @@ void setup() {
   Blynk.begin(BLYNK_AUTH_TOKEN, ssid, pass);
 
   dht.begin();
+  lcd.init();
+  lcd.backlight();
 }
 
 void loop() {
@@ -59,4 +64,15 @@ void loop() {
   Serial.println(F("°C \n"));
 
   Serial.print(soilMoisturePercent);
+
+  lcd.setCursor(0, 0);
+  lcd.print("H: ");
+  lcd.print(h);
+  lcd.print("%  T: ");
+  lcd.print(t);
+  lcd.print("°C");
+  lcd.setCursor(0, 1);
+  lcd.print("Kelembapan: ");
+  lcd.print(soilMoisturePercent);
+  lcd.print("%");
 }
